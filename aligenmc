@@ -10,7 +10,7 @@ Tool to run Monte Carlo generators in ALICE
 
 # default settings
 GENERATOR="thepeg"
-TUNE="DIPSY"
+TUNE="default"
 HEPMCFILENAME=gen.hepmc
 ENERGY="13000"
 NEV=100
@@ -62,7 +62,10 @@ CURRENTDIR=$(pwd)
 # include helpers
 . ${SCRIPTDIR}/parse_opts.sh
 . ${SCRIPTDIR}/tools.sh
-. ${SCRIPTDIR}/*/gen.sh
+# include generator hooks
+for gen in ${SCRIPTDIR}/*/gen.sh; do
+   . $gen
+done
 
 # parse options and check for consistency
 parse_args $*
