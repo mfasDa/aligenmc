@@ -27,7 +27,7 @@ describe_options() {
 
     echo "available generators:"
     for gen in $(generators); do
-	printf "  %-10s %s\n" "$gen:" $(gen_$gen)
+	printf "  %-10s %s\n" "$gen:" "$(gen_$gen)"
     done
     echo
 
