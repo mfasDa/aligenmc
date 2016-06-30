@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# Script to run ALICE Monte Carlo generators and tunes
+#
+# Author: Jochen Klein <Jochen.Klein@cern.ch>
+
+HELP="
+Tool to run Monte Carlo generators in ALICE
+"
+
+# default settings
+GENERATOR="thepeg"
+TUNE="DIPSY"
+HEPMCFILENAME=gen.hepmc
+ENERGY="13000"
+NEV=100
+SEED=0
+
+# options with short explanation (opt/par: without/with parameter)
+# keep order: help, setvar, additional output
+opt_h() {
+    help "print help"
+    setvar SHOWHELP
+}
+
+par_g() {
+    help "set generator"
+    setvar GENERATOR
+}
+
+par_t() {
+    help "set tune"
+    setvar TUNE
+}
+
+par_N() {
+    help "set total number of events"
+    setvar NEV
+}
+
+par_f() {
+    help "set HepMC file name and absolute path"
+    setvar HEPMCFILENAME
+}
+
+par_E() {
+    help "set energy"
+    setvar ENERGY
+}
+
+par_S() {
+    help "set seed"
+    setvar SEED
+}
+
+# initialisation
+SHOWHELP=no
+ERROR=0
+SCRIPTDIR=$(dirname $0)
+CURRENTDIR=$(pwd)
+
+# include helpers
+. ${SCRIPTDIR}/parse_opts.sh
+. ${SCRIPTDIR}/tools.sh
+. ${SCRIPTDIR}/*/gen.sh
+
+# parse options and check for consistency
+parse_args $*
+
+# if necessary show help and exit
+if [[ ${SHOWHELP} != "no" ]]; then
+    show_help
+    exit ${ERROR}
+fi
+
+# run the requested generator/tune combination
+gen_${GENERATOR} run
