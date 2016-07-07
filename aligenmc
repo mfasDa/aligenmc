@@ -60,10 +60,10 @@ SCRIPTDIR=$(dirname $0)
 CURRENTDIR=$(pwd)
 
 # include helpers
-. ${SCRIPTDIR}/parse_opts.sh
-. ${SCRIPTDIR}/tools.sh
+. ${SCRIPTDIR}/lib/parse_opts.sh
+. ${SCRIPTDIR}/lib/tools.sh
 # include generator hooks
-for gen in ${SCRIPTDIR}/*/gen.sh; do
+for gen in ${SCRIPTDIR}/gen/*/gen.sh; do
    . $gen
 done
 

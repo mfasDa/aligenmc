@@ -1,5 +1,5 @@
 dir_gen() {
-    echo ${SCRIPTDIR}/${GENERATOR}
+    echo ${SCRIPTDIR}/gen/${GENERATOR}
 }
 
 cp_input() {
