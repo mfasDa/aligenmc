@@ -38,8 +38,8 @@ par_N() {
     setvar NEV
 }
 
-par_f() {
-    help "set HepMC file name and absolute path"
+par_o() {
+    help "set HepMC output file"
     setvar HEPMCFILENAME
 }
 
