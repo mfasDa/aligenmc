@@ -28,10 +28,10 @@ par_g() {
     setvar GENERATOR
 }
 
-par_t() {
-    help "set tune"
-    setvar TUNE
-}
+#par_t() {
+#    help "set tune"
+#    setvar TUNE
+#}
 
 par_N() {
     help "set total number of events"
@@ -43,15 +43,15 @@ par_o() {
     setvar HEPMCFILENAME
 }
 
-par_E() {
-    help "set energy"
-    setvar ENERGY
-}
-
-par_S() {
-    help "set seed"
-    setvar SEED
-}
+#par_E() {
+#    help "set energy"
+#    setvar ENERGY
+#}
+#
+#par_S() {
+#    help "set seed"
+#    setvar SEED
+#}
 
 # initialisation
 SHOWHELP=no
