@@ -9,8 +9,8 @@ Tool to run Monte Carlo generators in ALICE
 "
 
 # default settings
-GENERATOR="thepeg"
-TUNE="default"
+GENERATOR="pythia6"
+TUNE=""
 HEPMCFILENAME=gen.hepmc
 ENERGY="13000"
 NEV=100

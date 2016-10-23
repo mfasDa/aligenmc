@@ -54,7 +54,7 @@ help() {
 }
 
 setvar() {
-    echo "| ${!1}"
+    echo "| ${!1:----}"
     if [ $# -le 1 ]; then
 	[ -z ${OPTARG} ] && eval "$1=yes" || eval "$1=${OPTARG}" 
     else
