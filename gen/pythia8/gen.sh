@@ -1,9 +1,9 @@
 gen_pythia8() {
     case $1 in
 	run)
-	    PACKAGES="Sacrifice/latest"
+	    PACKAGES="Sacrifice/v1.0.0-1,pythia/v8211pre-7"
 
-            run_in_env run-pythia --collision-energy 8000 -i AU2-CTEQ6L1 -c "SoftQCD:all=on" -n ${NEV} -o ${HEPMCFILENAME}
+            run_in_env run-pythia --collision-energy ${ENERGY} -i ${SCRIPTDIR}/gen/pythia8/params.txt -c "Tune:pp=${TUNE:-5}" -n ${NEV} -o ${HEPMCFILENAME}
 	    ;;
 
 	*)

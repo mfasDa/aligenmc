@@ -1,0 +1,18 @@
+#Beams
+Beams:idA = 2212 ! Proton
+Beams:idB = 2212
+# Min. bias
+SoftQCD:all = on
+# Set cuts
+# Use this for hard leading-jets in a certain pT window
+PhaseSpace:pTHatMin = 0   # min pT
+PhaseSpace:pTHatMax = 8000   # max pT
+# Use this for hard leading-jets in a certain mHat window
+PhaseSpace:mHatMin = 0   # min mHat
+PhaseSpace:mHatMax = 8000   # max mHat
+# Makes particles with c*tau > 10 mm stable:
+ParticleDecays:limitTau0 = On
+ParticleDecays:tau0Max = 10.0
+# Set tune
+Tune:preferLHAPDF=0 ! OK for internal tunes
+Tune:ee=7 ! pp tune will change it if needed
