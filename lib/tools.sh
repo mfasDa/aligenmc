@@ -7,5 +7,6 @@ cp_input() {
 }
 
 run_in_env() {
-    /cvmfs/alice.cern.ch/bin/alienv setenv ${PACKAGES} -c "$*"
+    # /cvmfs/alice.cern.ch/bin/alienv setenv ${PACKAGES} -c "$*"
+    /bin/bash -c "$*"
 }
