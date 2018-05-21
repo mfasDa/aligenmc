@@ -9,6 +9,7 @@ Tool to run Monte Carlo generators in ALICE
 "
 
 # default settings
+GEN_PACKAGES=""
 GENERATOR="pythia6"
 TUNE=""
 HEPMCFILENAME=gen.hepmc
@@ -46,6 +47,11 @@ par_o() {
 par_E() {
     help "set energy"
     setvar ENERGY
+}
+
+par_p() {
+    help "set packages to load"
+    setvar GEN_PACKAGES
 }
 
 #par_S() {

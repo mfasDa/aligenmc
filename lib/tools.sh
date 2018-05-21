@@ -7,6 +7,11 @@ cp_input() {
 }
 
 run_in_env() {
-    # /cvmfs/alice.cern.ch/bin/alienv setenv ${PACKAGES} -c "$*"
-    /bin/bash -c "$*"
+    if [[ -n ${GEN_PACKAGES} ]]; then
+#	/cvmfs/alice.cern.ch/bin/alienv setenv ${GEN_PACKAGES} -c "$*"
+	(eval $(alienv printenv ${GEN_PACKAGES}) && eval $*)
+#	alienv setenv ${GEN_PACKAGES} -c "$*"
+    else
+	/bin/bash -c "$*"
+    fi
 }

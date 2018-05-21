@@ -7,7 +7,7 @@ gen_jewel() {
 		-e "s,^\([[:space:]]*HEPMCFILE\) .*$,\1 ${HEPMCFILENAME}," \
 		$(dir_gen)/params-simple.dat > params.dat
 
-	    run_in_env jewel-2.0.2-vac params.dat > sim.log
+	    run_in_env jewel-2.2.0-vac params.dat > sim.log
 	    ;;
 
 	*)
