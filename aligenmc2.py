@@ -1,37 +1,87 @@
 #! /usr/bin/env python3
 
+""" aligenmc python port
+
+author:: Markus Fasel <markus.fasel@cern.ch>, ORNL
+author:: Raymond Ehlers <raymond.ehlers@cern.ch>, ORNL
+"""
+
 import argparse
-import os
+import importlib
+import inspect
+import logging
 import sys
+from pathlib import Path
+from typing import Dict, Union
 
-def find_plugins(inputdir):
-    plugins = []
-    for root, dirs, files in os.walk(os.getcwd()):
-        for fl in files:
-            if fl.endswith("gen.py"):
-                print("found %s" %fl)
-                plugins.append(os.path.join(root, fl))
-    return plugins
+import generator
 
-def extract_generator(pluginpath):
-    tags = pluginpath.split("/")
-    return tags[len(tags) - 2]
+
+logger = logging.getLogger(__name__)
+
+
+def discover_generators(base_generator_dir: Union[Path, str] = Path("gen"), generator_file_name: str = "gen.py") -> Dict[str, generator.Generator]:
+    """ Discover generators based on the specified directory structure and filename.
+
+    Finds the generators, loads the modules, and retrieves the generator classes
+
+    Args:
+        base_generator_dir: Base generator directory. Default: "gen"
+        generator_file_name: Filename of the generator. Default: "gen.py"
+    Returns:
+        Dict containing each generator class defined by the modules. Keys are the generator names.
+    """
+    # Validation
+    base_generator_dir = Path(base_generator_dir)
+    generators = {}
+    for generator_directory in base_generator_dir.glob("*"):
+        # Validation
+        # Require it to be a non-hidden directory.
+        if not generator_directory.is_dir() or generator_directory.name.startswith("_"):
+            continue
+
+        # Extract generator name based on the directory.
+        generator_name = generator_directory.name
+
+        # Import it, and load all Generator classes.
+        try:
+            # Convert the path into a module name.
+            module_path = str(generator_directory / generator_file_name).replace(".py", "").replace("/", ".")
+            generator_module = importlib.import_module(module_path)
+            classes = {
+                name: cls for name, cls in inspect.getmembers(generator_module, inspect.isclass)
+                # Only provide classes of interest.
+                if issubclass(cls, generator.Generator)
+            }
+            if len(classes) == 1:
+                generators[generator_directory.name] = next(iter(classes.values()))
+            else:
+                # Handle multiple generators.
+                for generator_class_name, cls in classes:
+                    generators[f"{generator_name}_{generator_class_name}"] = cls
+        except ImportError as e:
+            logger.warning(f"Unable to load generator for '{generator_name}'")
+
+    return generators
+
+
 
 def availble_generators(plugins):
     helptext = "Available generators:\n"
     for genname, generator in plugins.items():
-        helptext += "  %s: %s" %(genname, generator.description())
+        helptext += f"  {genname}: {generator.description()}"
     return helptext
 
-if __name__ == "__main__":
-    sourcedir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    plugins = {}
-    for pl in find_plugins(sourcedir):
-        plugin = __import__(pl)
-        plugins[extract_generator(plugin)] = plugin.gen() 
 
+if __name__ == "__main__":
+    # Setup
+    logging.basicConfig(format="%(asctime)s %(name)s:%(lineno)d %(levelname)s %(message)s")
+    logger.setLevel(logging.INFO)
+
+    # Setup
+    plugins = discover_generators()
     generators_string = availble_generators(plugins)
-    print("generators: %s" %generators_string)
+    logger.info(f"\ngenerators: {generators_string}")
 
     parser = argparse.ArgumentParser(prog="aligenmc2", description="Tool to run Monte Carlo generators in ALICE", epilog=generators_string)
     parser.add_argument("-g", "--generator", metavar="GENERATOR", type=str, required=True, help="Generator type (see below)")
@@ -54,7 +104,7 @@ if __name__ == "__main__":
         parser.print_help()
         sys.exit(1)
 
-    argmap = {"energy": args.energy, "nevents": args.nevents, "seed": args.seed, "outputfile": args.outputfile, "tune": args.tune, 
+    argmap = {"energy": args.energy, "nevents": args.nevents, "seed": args.seed, "outputfile": args.outputfile, "tune": args.tune,
               "packages": args.packages, "kthardmin": args.ktmin, "kthardmax": args.ktmax}
     gen_runner = plugins[args.generator]
-    gen_runner.run(argmap)
+    gen_runner.run(**argmap)
