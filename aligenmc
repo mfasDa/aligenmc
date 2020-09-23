@@ -16,6 +16,8 @@ HEPMCFILENAME=gen.hepmc
 ENERGY="13000"
 NEV=100
 SEED=0
+KTMIN=""
+KTMAX=""
 
 # options with short explanation (opt/par: without/with parameter)
 # keep order: help, setvar, additional output
@@ -54,10 +56,19 @@ par_p() {
     setvar GEN_PACKAGES
 }
 
-#par_S() {
-#    help "set seed"
-#    setvar SEED
-#}
+par_S() {
+    help "set seed"
+    setvar SEED
+}
+
+par_k() {
+    help "set ktmin"
+    setvar KTMIN
+}
+
+par_K() {
+    help "set ktmax"
+}
 
 # initialisation
 SHOWHELP=no
