@@ -2,7 +2,7 @@
 
 import argparse
 
-def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile):
+def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, ktmax):
     # See (minimum-bias): http://mcplots.cern.ch/dat/pp/jets/pt/atlas3-akt4/7000/herwig++/2.7.1/default.params
     # See (jet): http://mcplots.cern.ch/dat/pp/jets/pt/cms2011-y0.5/7000/herwig++/2.7.1/default.params
     # See also for minimum-bias: Chapter B.2 https://arxiv.org/abs/0803.0883
@@ -13,24 +13,38 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile):
             myfile.write("set /Herwig/MatrixElements/MEHeavyQuark:QuarkType 5\n")
             myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEHeavyQuark\n")
             myfile.write("set /Herwig/Cuts/JetKtCut:MinKT 0.0*GeV\n")
+            myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT {}.0*GeV\n".format(cmsenegy))
             myfile.write("set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE -1\n")
         elif tune == "charm":
             myfile.write("set /Herwig/MatrixElements/MEHeavyQuark:QuarkType 4\n")
             myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEHeavyQuark\n")
             myfile.write("set /Herwig/Cuts/JetKtCut:MinKT 0.0*GeV\n")
+            myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT {}.0*GeV\n".format(cmsenegy))
             myfile.write("set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE -1\n")
         elif tune == "dijet":
             myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEQCD2to2\n")
             myfile.write("set /Herwig/Cuts/JetKtCut:MinKT 5.0*GeV\n")
+            myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT {}.0*GeV\n".format(cmsenegy))
             myfile.write("set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE -1\n")
         elif tune == "mb":
             myfile.write("read MB.in\n")
             myfile.write("set /Herwig/Cuts/JetKtCut:MinKT 0.0*GeV\n")
+            myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT {}.0*GeV\n".format(cmsenegy))
             myfile.write("set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE 0\n")
+        elif tune == "kthard":
+            myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEQCD2to2\n")
+            localktmin = ktmin
+            localktmax = ktmax
+            if localktmin < 0:
+                localktmin > 0
+            if localktmax < 0 or localktmax > cmsenegy:
+                localktmax = cmsenegy
+            myfile.write("set /Herwig/Cuts/JetKtCut:MinKT %f*GeV\n" %(localktmin))
+            myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT %f*GeV\n" %(localktmax))
+            myfile.write("set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE -1\n")
         else:
             print("Process '{}' not implemented for HERWIG!".format(tune))
             exit(1)
-        myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT {}.0*GeV\n".format(cmsenegy))
         myfile.write("set /Herwig/Cuts/Cuts:MHatMax {}.0*GeV\n".format(cmsenegy))
         myfile.write("set /Herwig/Cuts/Cuts:MHatMin 0.0*GeV\n")
         myfile.write("read SoftTune.in\n")
@@ -59,6 +73,10 @@ if __name__ == '__main__':
                         default='herwig.in')
     parser.add_argument('--hepmcfile', metavar='HEPMCFILE', 
                         default='events.hepmc')
+    parser.add_argument('--ktmin', metavar='KTMIN',
+                        default=-1., type=float)
+    parser.add_argument('--ktmax', metavar='KTMAX',
+                        default=-1., type=float)
     args = parser.parse_args()
 
-    GenerateHerwigInput(args.herwigfile, args.tune, args.energy, args.numevents, args.hepmcfile)
+    GenerateHerwigInput(args.herwigfile, args.tune, args.energy, args.numevents, args.hepmcfile, args.ktmin, args.ktmax)

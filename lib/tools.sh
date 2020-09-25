@@ -9,7 +9,7 @@ cp_input() {
 run_in_env() {
     if [[ -n ${GEN_PACKAGES} ]]; then
 #	/cvmfs/alice.cern.ch/bin/alienv setenv ${GEN_PACKAGES} -c "$*"
-	(eval $(alienv printenv ${GEN_PACKAGES}) && eval $*)
+	(eval $(alienv --no-refresh printenv ${GEN_PACKAGES}) && eval $*)
 #	alienv setenv ${GEN_PACKAGES} -c "$*"
     else
 	/bin/bash -c "$*"
