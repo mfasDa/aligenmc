@@ -1,7 +1,7 @@
 gen_herwig(){
     case $1 in
     run)
-        PACKAGES="Herwig::v7.1.2-alice1-3"
+        PACKAGES="Herwig::v7.2.0-4"
 
         cmd=$(printf "python3 %s/generate_hwgin.py --herwigfile herwig.in" $(dir_gen))
         if [ "x${HEPMCFILENAME}" != "x" ]; then cmd=$(printf "%s --hepmcfile %s" "$cmd" ${HEPMCFILENAME}); fi
