@@ -11,10 +11,11 @@ gen_herwig(){
         if [ "x${KTMIN}" != "x" ]; then cmd=$(printf "%s --ktmin %s" "$cmd" ${KTMIN}); fi
         if [ "x${KTMAX}" != "x" ]; then cmd=$(printf "%s --ktmax %s" "$cmd" ${KTMAX}); fi
         eval $cmd
-        cp_input PPCollider.in .
-        cp_input SoftModel.in .
-        cp_input SoftTune.in .
-        if [ "x${TUNE}" == "xmb" ]; then cp_input MB.in .; fi
+        if [ "x${TUNE}" != "xmb" ]; then
+            cp_input DefaultTune.in .
+            cp_input SoftTune.in .
+        fi
+
 
         run_in_env 'Herwig --repo=${HERWIG_ROOT}/share/Herwig/HerwigDefaults.rpo read herwig.in' > setup.log
         run_in_env 'Herwig --repo=${HERWIG_ROOT}/share/Herwig/HerwigDefaults.rpo run herwig.run -N ${NEV} --seed ${SEED}' > hwgen.log
