@@ -7,7 +7,7 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
     # See (jet): http://mcplots.cern.ch/dat/pp/jets/pt/cms2011-y0.5/7000/herwig++/2.7.1/default.params
     # See also for minimum-bias: Chapter B.2 https://arxiv.org/abs/0803.0883
     with open(outputfile, "w") as myfile:
-        myfile.write("read snippets/PPCollider.in\n") # Markus: Take PPCollider.in fron Herwig repositiory instead of custom version
+        myfile.write("read snippets/PPCollider.in\n") # Markus: Take PPCollider.in from Herwig repositiory instead of custom version
         myfile.write("set /Herwig/Generators/EventGenerator:EventHandler:LuminosityFunction:Energy {}.0\n".format(cmsenegy))
         if tune == "mb":
             # MB tune from Herwig repo
