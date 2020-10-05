@@ -2,6 +2,31 @@
 
 import argparse
 
+def setupMatchBox(configwriter, process, loopprovider):
+    ''' Setup MatchBox for NLO process generation
+
+        Based on LHC-Matchbox.in
+    '''
+    configwriter.write("read snippets/Matchbox.in\n")
+    configwriter.write("read Matchbox/StandardModelLike.in\n")
+    configwriter.write("read Matchbox/DiagonalCKM.in\n")
+    ## Set the order of the couplings
+    configwriter.write("cd /Herwig/MatrixElements/Matchbox\n")
+    configwriter.write("set Factory:OrderInAlphaS 0\n")
+    configwriter.write("set Factory:OrderInAlphaEW 2\n")
+    ## Select the process
+    ## You may use identifiers such as p, pbar, j, l, mu+, h0 etc.
+    configwriter.write("do Factory:Process {}\n".format(process))
+    configwriter.write("set Factory:ScaleChoice Scales/MaxJetPtScale\n")
+    ## Select a generic tree/loop combination or a
+    ## specialized NLO package
+    ## Currently ALICE has only openloops support, MadGraph to be added soon 
+    ## All other ME providers irrelevant for ALICE
+    # read Matchbox/MadGraph-MadGraph.in
+    configwriter.write("read Matchbox/{}.in\n".format(loopprovider))
+    configwriter.write("read Matchbox/CT14.in\n")
+    configwriter.write("do /Herwig/MatrixElements/Matchbox/Factory:ProductionMode\n")
+
 def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, ktmax):
     # See (minimum-bias): http://mcplots.cern.ch/dat/pp/jets/pt/atlas3-akt4/7000/herwig++/2.7.1/default.params
     # See (jet): http://mcplots.cern.ch/dat/pp/jets/pt/cms2011-y0.5/7000/herwig++/2.7.1/default.params
@@ -17,11 +42,7 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
         else:
             # Use SoftTune as UE tune for Herwig7 (>= 7.1) based on https://herwig.hepforge.org/tutorials/mpi/tunes.html
             myfile.write("read SoftTune.in\n")
-            # Set PDF (LO)
-            myfile.write("set /Herwig/Partons/HardLOPDF:PDFName CT14lo\n")
-            myfile.write("set /Herwig/Partons/ShowerLOPDF:PDFName CT14lo\n")
-            myfile.write("set /Herwig/Partons/MPIPDF:PDFName CT14lo\n")
-            myfile.write("set /Herwig/Partons/RemnantPDF:PDFName CT14lo\n")
+            isLeadingOrder = False
             kthardmin = 0.
             kthardmax = 0.
             if tune == "beauty" or tune == "charm":
@@ -30,11 +51,14 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
                 myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEHeavyQuark\n")
                 kthardmin = 0.
                 kthardmax = float(cmsenegy)
+                isLeadingOrder = True
             elif tune == "dijet_lo":
                 myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEQCD2to2\n")
                 kthardmin = 5.
                 kthardmax = float(cmsenegy)
-            elif tune == "kthard":
+                isLeadingOrder = True
+            elif tune == "kthard_lo":
+                isLeadingOrder = True
                 myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEQCD2to2\n")
                 kthardmin = ktmin
                 kthardmax = ktmax
@@ -42,9 +66,26 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
                     kthardmin = 0
                 if kthardmax < 0 or kthardmax > cmsenegy:
                     kthardmax = cmsenegy
+            elif tune == "dijet_nlo_ol":
+                setupMatchBox(myfile, "p p -> j j", "OpenLoops-OpenLoops")
+                kthardmin = 5.
+                kthardmax = float(cmsenegy)
+            elif tune == "dijet_nlo_mg":
+                setupMatchBox(myfile, "p p -> j j", "MadGraph-MadGraph")
+                kthardmin = 5.
+                kthardmax = float(cmsenegy)
             else:
                 print("Process '{}' not implemented for HERWIG!".format(tune))
                 exit(1)
+            if isLeadingOrder:
+                # Set PDF (LO)
+                # do not set in case of NLO, there Hard processes need to be simulated
+                # with NLO PDF sets while shower and MPI need to be simulated with LO
+                # PDF set
+                myfile.write("set /Herwig/Partons/HardLOPDF:PDFName CT14lo\n")
+                myfile.write("set /Herwig/Partons/ShowerLOPDF:PDFName CT14lo\n")
+                myfile.write("set /Herwig/Partons/MPIPDF:PDFName CT14lo\n")
+                myfile.write("set /Herwig/Partons/RemnantPDF:PDFName CT14lo\n")
             myfile.write("set /Herwig/Cuts/JetKtCut:MinKT %f*GeV\n" %(kthardmin))
             myfile.write("set /Herwig/Cuts/JetKtCut:MaxKT %f*GeV\n" %(kthardmax))
             myfile.write("set /Herwig/Cuts/Cuts:MHatMax {}.0*GeV\n".format(cmsenegy))
