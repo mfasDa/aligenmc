@@ -92,7 +92,24 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
             myfile.write("set /Herwig/Cuts/Cuts:MHatMin 0.0*GeV\n")
             myfile.write("set /Herwig/UnderlyingEvent/MPIHandler:IdenticalToUE -1\n")
 
-        # Stable particles with a lifetime > 10 mm (decay externally)
+        # Setting particles stable by hand (based on the definition in AliPythia8):
+        # Those particles are not decayed by Herwig but must be decayed by an external
+        # decayer (i.e. pythia or EVGEN). This is important i.e. for full simulations
+        # where the particles can still interact with the material
+        # - K0l (130)
+        # - K0s (310)
+        # - Lambda (3122)
+        # - Sigma (+ -> 3222, 0 -> 3212, - -> 3112)
+        # - Xi (0 -> 3322, - -> 3312)
+        # - Omega (3334)
+        # Also set corresponding antiparticles to stable
+        stableparticles = ["K0", "Kbar0", "Lambda0", "Lambdabar0", "Sigma0", "Sigmabar0", 
+                           "Sigma+", "Sigmabar-", "Sigma-", "Sigmabar+", "Xi0", "Xibar0" 
+                           "Xi-", "Xibar+", "Omega-", "Omegabar+"]
+        for particle in stableparticles:
+            myfile.write("set /Herwig/Particle/{}:Stable Stable".format(particle))
+
+        # In addition: stable particles with a lifetime > 10 mm (decay externally)
         myfile.write("set /Herwig/Decays/DecayHandler:MaxLifeTime 10*mm\n")
         myfile.write("set /Herwig/Decays/DecayHandler:LifeTimeOption Average\n")
 
