@@ -45,12 +45,20 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
             isLeadingOrder = False
             kthardmin = 0.
             kthardmax = 0.
-            if tune == "beauty" or tune == "charm":
+            if "beauty" in tune or "charm" in tune:
                 quarktye = 4 if tune == "charm" else 5
                 myfile.write("set /Herwig/MatrixElements/MEHeavyQuark:QuarkType {}\n".format(quarktye))
                 myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEHeavyQuark\n")
-                kthardmin = 0.
-                kthardmax = float(cmsenegy)
+                if "kthard" in tune:
+                    kthardmin = ktmin
+                    kthardmax = ktmax
+                    if kthardmin < 0:
+                        kthardmin = 0
+                    if kthardmax < 0 or kthardmax > cmsenegy:
+                        kthardmax = cmsenegy
+                else:
+                    kthardmin = 0.
+                    kthardmax = float(cmsenegy)
                 isLeadingOrder = True
             elif tune == "dijet_lo":
                 myfile.write("insert /Herwig/MatrixElements/SubProcess:MatrixElements[0] /Herwig/MatrixElements/MEQCD2to2\n")
