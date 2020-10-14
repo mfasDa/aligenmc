@@ -27,6 +27,6 @@ run_in_env() {
         fi
 #	    alienv setenv ${GEN_PACKAGES} -c "$*"
     else
-	    /bin/bash -c "$*"
+	    (eval $*)
     fi
 }
