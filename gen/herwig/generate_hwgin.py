@@ -112,10 +112,10 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
         # - Omega (3334)
         # Also set corresponding antiparticles to stable
         stableparticles = ["K0", "Kbar0", "Lambda0", "Lambdabar0", "Sigma0", "Sigmabar0", 
-                           "Sigma+", "Sigmabar-", "Sigma-", "Sigmabar+", "Xi0", "Xibar0" 
+                           "Sigma+", "Sigmabar-", "Sigma-", "Sigmabar+", "Xi0", "Xibar0", 
                            "Xi-", "Xibar+", "Omega-", "Omegabar+"]
         for particle in stableparticles:
-            myfile.write("set /Herwig/Particle/{}:Stable Stable".format(particle))
+            myfile.write("set /Herwig/Particles/{}:Stable Stable\n".format(particle))
 
         # In addition: stable particles with a lifetime > 10 mm (decay externally)
         myfile.write("set /Herwig/Decays/DecayHandler:MaxLifeTime 10*mm\n")

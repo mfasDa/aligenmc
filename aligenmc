@@ -68,6 +68,7 @@ par_k() {
 
 par_K() {
     help "set ktmax"
+    setvar KTMAX
 }
 
 # initialisation
