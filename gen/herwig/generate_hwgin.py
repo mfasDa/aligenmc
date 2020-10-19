@@ -34,6 +34,9 @@ def GenerateHerwigInput(outputfile, tune, cmsenegy, events, hepmcfile, ktmin, kt
     with open(outputfile, "w") as myfile:
         myfile.write("read snippets/PPCollider.in\n") # Markus: Take PPCollider.in from Herwig repositiory instead of custom version
         myfile.write("set /Herwig/Generators/EventGenerator:EventHandler:LuminosityFunction:Energy {}.0\n".format(cmsenegy))
+        # reduce verbosity in log file,
+        # print only the first event (for whatever reason Herwig uses N+1 here)
+        myfile.write("set /Herwig/Generators/EventGenerator:PrintEvent 2\n") 
         if tune == "mb":
             # MB tune from Herwig repo
             myfile.write("set /Herwig/Shower/ShowerHandler:IntrinsicPtGaussian 2.2*GeV\n")
